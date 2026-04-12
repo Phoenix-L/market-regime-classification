@@ -13,13 +13,16 @@
 - Implemented explicit 3-state classifier and confirmation logic.
 - Added focused unit tests around signal and state behavior.
 
-## Phase 3 — Visualization Baseline (Next)
+## Phase 3 — Visualization Baseline (Completed: v0.1 baseline)
 
-- Implement baseline price/regime overlays.
-- Add Wilder diagnostic panes.
-- Add exportable static plotting utilities.
+- Implemented default 3-pane Wilder diagnostic plot:
+  - price + regime overlay,
+  - ADX strength pane,
+  - DMI direction pane.
+- Added saved-artifact path and DetectionResult plotting entry point.
+- Added visualization smoke and overlay behavior tests.
 
-## Phase 4 — Evaluation Baseline
+## Phase 4 — Evaluation Baseline (Next)
 
 - Implement regime duration/transition metrics.
 - Implement event-study style forward behavior modules.
