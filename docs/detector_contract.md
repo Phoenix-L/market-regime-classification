@@ -27,9 +27,9 @@ Return `DetectionResult` with:
 ## Required Output Fields (Per Bar)
 
 At minimum, detector output table should include:
-- `raw_state` (proposal before anti-flip confirmation)
-- `confirmed_state` (post state-machine gate)
-- `direction` (Up/Down/None)
+- `regime_raw` (proposal before anti-flip confirmation)
+- `regime_final` (post state-machine gate)
+- `regime_direction` (Up/Down/None)
 - `state_age` (bars since confirmed state start)
 - `transition_reason` (optional textual marker)
 - `confidence` (placeholder optional)
