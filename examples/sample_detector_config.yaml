@@ -1,0 +1,14 @@
+# Sample configuration scaffold for future detector runs.
+
+detector: wilder_style
+symbol: SPY
+timeframe: 1D
+start: 2020-01-01
+end: 2025-12-31
+
+config:
+  trend_window: 14
+  volatility_window: 14
+  min_dwell_bars: 3
+
+# TODO: align runtime config keys with finalized detector + market-data-core loader contract.
