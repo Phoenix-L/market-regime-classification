@@ -10,9 +10,9 @@ from .enums import RegimeDirection, RegimeState
 class RegimeObservation:
     """Per-bar regime representation used for standardized detector outputs."""
 
-    raw_state: RegimeState
-    confirmed_state: RegimeState
-    direction: RegimeDirection
+    regime_raw: RegimeState
+    regime_final: RegimeState
+    regime_direction: RegimeDirection
     state_age: int
     transition_reason: Optional[str] = None
     confidence: Optional[float] = None
