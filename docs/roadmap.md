@@ -1,25 +1,28 @@
 # Roadmap
 
-## Phase 0/1 — Bootstrap + Contract Alignment (Current)
+## Phase 0/1 — Bootstrap + Contract Alignment (Completed)
 
 - Establish repository skeleton.
 - Define architecture and detector contracts.
 - Clarify boundary with `market-data-core`.
 - Add lightweight scaffold tests.
 
-## Phase 2 — Wilder-Style Detector Implementation
+## Phase 2 — Wilder-Style Detector Implementation (Completed: v0.1 baseline)
 
-- Implement detector internals (signals + classifier + state mapping).
-- Add config schema validation.
-- Add focused unit tests around state behavior.
+- Implemented Wilder internals (TR/DM/DI/DX/ADX + derived signals).
+- Implemented explicit 3-state classifier and confirmation logic.
+- Added focused unit tests around signal and state behavior.
 
-## Phase 3 — Visualization Baseline
+## Phase 3 — Visualization Baseline (Completed: v0.1 baseline)
 
-- Implement baseline price/regime overlays.
-- Add Wilder diagnostic panes.
-- Add exportable static plotting utilities.
+- Implemented default 3-pane Wilder diagnostic plot:
+  - price + regime overlay,
+  - ADX strength pane,
+  - DMI direction pane.
+- Added saved-artifact path and DetectionResult plotting entry point.
+- Added visualization smoke and overlay behavior tests.
 
-## Phase 4 — Evaluation Baseline
+## Phase 4 — Evaluation Baseline (Next)
 
 - Implement regime duration/transition metrics.
 - Implement event-study style forward behavior modules.

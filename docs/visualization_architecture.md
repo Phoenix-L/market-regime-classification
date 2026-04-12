@@ -4,25 +4,57 @@
 
 Visualization is first-class for detector diagnosis, not an afterthought.
 
-## Planned Components
+## Phase 3 Baseline (Implemented)
 
-- **Price/regime overlays**: colorized confirmed-state bands over price.
-- **Detector-specific panes**: family-specific evidence diagnostics.
-- **Comparison strips**: aligned state ribbons for multi-detector runs.
-- **Transition markers**: annotation of confirmed state changes.
+Default single-detector layout (Wilder baseline):
+- **Pane 1**: close price with confirmed-regime background shading.
+- **Pane 2**: ADX line (+ optional threshold references).
+- **Pane 3**: DI+ / DI- lines (+ optional crossover markers).
 
-## Default Wilder-Style Pane Separation (Planned)
+Rationale:
+- keep trend strength (ADX) visually separate from directional dominance (DMI),
+- make structural regime and transition points easy to inspect against price.
 
-- Pane 1: price + confirmed regime overlay.
-- Pane 2: Wilder evidence signals (e.g., trend strength components).
-- Pane 3: state-machine diagnostics (raw vs confirmed, dwell counters).
+## Module Responsibilities
 
-## Multi-Detector Comparison Layout (Planned)
+- `visualization/panes.py`
+  - reusable pane construction,
+  - price/ADX/DMI plotting helpers,
+  - shared axis conventions.
 
-- Shared top price panel.
-- One compact regime strip per detector.
-- Optional aggregate disagreement/conflict panel.
+- `visualization/overlays.py`
+  - regime background shading,
+  - transition markers,
+  - compact regime strip helpers.
+
+- `visualization/regime_plot.py`
+  - detector-output-driven single-detector plotting entry points,
+  - save-to-file support,
+  - return figure/axes for notebooks/scripts.
+
+- `visualization/comparison_plot.py`
+  - minimal Phase 3 scaffold for compact multi-detector regime strips,
+  - full comparison dashboards deferred to Phase 6.
+
+## Input Contract for Plotting
+
+Expected columns (minimum):
+- `close`
+- `adx`
+- `di_plus`
+- `di_minus`
+- `regime_final`
+- `regime_direction`
+
+Optional diagnostics:
+- `regime_raw`, `transition_reason`, `state_age`, `di_gap`, `adx_slope`.
 
 ## Scope Boundary
 
 Visualization modules consume detector outputs; they do not ingest/clean raw market data.
+
+## Deferred to Later Phases
+
+- richer multi-detector comparison layouts,
+- disagreement/conflict panels,
+- evaluation-linked report rendering.
