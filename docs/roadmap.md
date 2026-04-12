@@ -22,13 +22,14 @@
 - Added saved-artifact path and DetectionResult plotting entry point.
 - Added visualization smoke and overlay behavior tests.
 
-## Phase 4 — Evaluation Baseline (Next)
+## Phase 4 — Evaluation Baseline (Completed: v0.1 baseline)
 
-- Implement regime duration/transition metrics.
-- Implement event-study style forward behavior modules.
-- Add reproducible report tables.
+- Implemented regime stability statistics (run lengths, durations, transition matrix).
+- Implemented grouped forward-behavior summaries by regime.
+- Implemented transition/event-study baseline with aligned pre/post windows.
+- Added comparison-ready summary scaffold and focused evaluation tests.
 
-## Phase 5 — Feature-Based Detector Implementation
+## Phase 5 — Feature-Based Detector Implementation (Next)
 
 - Implement feature extraction + model-style classification pipeline.
 - Integrate with shared state-machine contract.

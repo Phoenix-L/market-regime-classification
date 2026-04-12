@@ -31,19 +31,19 @@ See `docs/boundary_with_market_data_core.md` for explicit boundary definitions.
 
 ## Current maturity
 
-This repo is currently in **Phase 3: visualization baseline for the Wilder-style detector**.
+This repo is currently in **Phase 4: evaluation baseline for the Wilder-style detector**.
 
 Included now:
 - repository/package skeleton and contracts,
 - implemented Wilder-style detector (signals + classifier + state machine),
-- detector output schema plus baseline visualization artifacts (price/regime, ADX, DMI),
+- detector output schema, baseline visualization artifacts (price/regime, ADX, DMI), and baseline evaluation toolkit,
 - architecture and planning documents,
 - focused unit tests for core and Wilder baseline behavior.
 
 Not included yet:
 - feature-based detector implementation,
-- full evaluation report framework,
-- advanced multi-detector comparison dashboards/workflows.
+- advanced multi-detector comparison dashboards/workflows,
+- richer statistical ranking/significance layer for cross-detector studies.
 
 ## Planned detector families
 
@@ -52,7 +52,7 @@ Not included yet:
 
 ## Next implementation steps
 
-1. Add Phase 4 evaluation baseline (duration/transition/event-study summaries).
-2. Expand Phase 5 feature-based detector and shared visual diagnostics.
-3. Build Phase 6 multi-detector comparison workflows.
-4. Iterate thresholds and transition controls with reproducible research reports.
+1. Implement Phase 5 feature-based detector with shared contracts.
+2. Expand visual/evaluation diagnostics for multi-detector parity.
+3. Build Phase 6 comparison workflows and standardized benchmark reports.
+4. Add richer statistical significance tooling for detector comparison.
