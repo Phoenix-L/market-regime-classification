@@ -46,6 +46,12 @@ Expected columns (minimum):
 - `regime_final`
 - `regime_direction`
 
+Validation behavior:
+- plotting validates required columns on every row, not just the first row,
+- `close` must be numeric,
+- `regime_final` must be one of `oscillating|transition|trending`,
+- `regime_direction` must be one of `up|down|none`.
+
 Optional diagnostics:
 - `regime_raw`, `transition_reason`, `state_age`, `di_gap`, `adx_slope`.
 

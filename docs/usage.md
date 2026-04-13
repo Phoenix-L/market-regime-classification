@@ -45,9 +45,9 @@ Minimal end-to-end example using in-memory OHLCV bars:
 from market_regime_classification.detectors.wilder_style import WilderStyleDetector
 
 bars = [
-    {"ts": "2026-01-01", "open": 100, "high": 101, "low": 99, "close": 100.5, "volume": 1000},
-    {"ts": "2026-01-02", "open": 100.5, "high": 102, "low": 100, "close": 101.8, "volume": 1200},
-    {"ts": "2026-01-03", "open": 101.8, "high": 103, "low": 101, "close": 102.6, "volume": 1100},
+    {"symbol": "SPY", "timestamp": "2026-01-01T00:00:00+00:00", "open": 100, "high": 101, "low": 99, "close": 100.5, "volume": 1000},
+    {"symbol": "SPY", "timestamp": "2026-01-02T00:00:00+00:00", "open": 100.5, "high": 102, "low": 100, "close": 101.8, "volume": 1200},
+    {"symbol": "SPY", "timestamp": "2026-01-03T00:00:00+00:00", "open": 101.8, "high": 103, "low": 101, "close": 102.6, "volume": 1100},
     # ... more bars
 ]
 
@@ -58,7 +58,7 @@ print(result.summary)
 print(result.bars[-3:])  # last 3 enriched rows with regime labels + indicators
 ```
 
-The detector input is currently `list[dict]` with OHLCV keys (`open`, `high`, `low`, `close`, `volume`).
+The detector input is currently `list[dict]` with required fields `symbol`, `timestamp`, `open`, `high`, `low`, `close`, `volume` (with timezone-aware `timestamp`).
 
 ## 4. Core Workflow
 
@@ -69,9 +69,9 @@ Get curated bars from `market-data-core` (or adapt from your own upstream pipeli
 ```python
 # Pseudocode: adapt this to your market-data-core API
 # df = market_data_core_client.get_bars(symbol="SPY", timeframe="1D", start="2024-01-01", end="2025-12-31")
-# bars = df[["ts", "open", "high", "low", "close", "volume"]].to_dict("records")
+# bars = df[["symbol", "timestamp", "open", "high", "low", "close", "volume"]].to_dict("records")
 
-bars = your_market_data_core_loader(...)
+bars = your_market_data_core_loader(...)  # already canonicalized/validated upstream
 ```
 
 ### 4.2 Run detector
@@ -155,8 +155,10 @@ result = detector.run(bars, config=config)
 ### Expected inputs
 
 - Data type: `list[dict]`
-- Required fields: `open`, `high`, `low`, `close`, `volume`
-- Optional extra fields (kept in output): timestamp, symbol, timeframe metadata, etc.
+- Required fields: `symbol`, `timestamp`, `open`, `high`, `low`, `close`, `volume`
+- `timestamp` must be timezone-aware and rows must be strictly increasing by timestamp
+- Minimal detector pipeline expects a single symbol / single timeframe ordered series
+- Optional extra fields (kept in output): `turnover_rate` and metadata fields
 
 ### Produced outputs
 
@@ -256,7 +258,7 @@ Useful for analyzing what tends to happen before/after confirmed state changes.
 
 ## 9. Working with market-data-core
 
-This repository expects cleaned, canonical bars from `market-data-core`; it does **not** provide raw market-data ingestion.
+This repository expects canonical bars from `market-data-core`; it does **not** provide raw ingestion, fallback cleaning, or canonicalization.
 
 Integration pattern:
 
@@ -267,7 +269,7 @@ from market_regime_classification.detectors.wilder_style import WilderStyleDetec
 bars_df = your_market_data_core_loader(symbol="BTC-USD", timeframe="1H", start="2025-01-01", end="2025-06-30")
 
 # 2) Normalize into list[dict] for detector input
-bars = bars_df[["ts", "open", "high", "low", "close", "volume"]].to_dict("records")
+bars = bars_df[["symbol", "timestamp", "open", "high", "low", "close", "volume"]].to_dict("records")
 
 # 3) Run detector
 result = WilderStyleDetector().run(bars)
@@ -275,7 +277,8 @@ result = WilderStyleDetector().run(bars)
 
 Input assumptions for best results:
 - OHLCV values are numeric and pre-validated upstream.
-- Bar ordering is chronological.
+- Bar ordering is strictly increasing by timezone-aware `timestamp`.
+- Bars are a single symbol / single timeframe ordered series.
 - Session/calendar and missing-data handling are already resolved upstream.
 
 ## 10. Common Patterns
