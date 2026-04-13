@@ -5,6 +5,7 @@ market data. It intentionally does not fetch, clean, or canonicalize data.
 """
 
 from datetime import datetime
+import math
 from typing import Any, Mapping
 
 from .exceptions import DetectorContractError
@@ -80,9 +81,11 @@ def validate_detector_input_v1(data: Any) -> list[dict[str, Any]]:
 
         for col in _NUMERIC_COLUMNS:
             try:
-                float(row_dict[col])
+                value = float(row_dict[col])
             except (TypeError, ValueError) as exc:
                 raise DetectorContractError(f"row {i} column '{col}' must be castable to numeric") from exc
+            if not math.isfinite(value):
+                raise DetectorContractError(f"row {i} column '{col}' must be finite numeric")
 
         rows.append(row_dict)
         prev_ts = ts

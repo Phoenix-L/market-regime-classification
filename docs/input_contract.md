@@ -29,7 +29,7 @@ It does **not** perform upstream responsibilities such as provider access, canon
 3. Minimal detector pipeline input must be a single symbol / single timeframe ordered series.
 4. Rows must be strictly ordered by `timestamp` ascending.
 5. `(symbol, timestamp)` must be unique.
-6. Numeric detector inputs (`open`, `high`, `low`, `close`, `volume`) must be castable to numeric.
+6. Numeric detector inputs (`open`, `high`, `low`, `close`, `volume`) must be castable to finite numeric values (no NaN/Inf).
 7. Expected timezone convention must align with upstream `market-data-core` contract.
 
 ## Runtime enforcement

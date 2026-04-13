@@ -39,6 +39,7 @@ See `docs/boundary_with_market_data_core.md` for ownership boundaries.
 - Output contract: `docs/output_contract.md`
 - Minimal pipeline: `docs/pipeline.md`
 - State-machine policy: `docs/state_machine.md`
+- Wilder detector reference: `docs/detectors/wilder.md`
 
 ## Minimal detector usage
 
