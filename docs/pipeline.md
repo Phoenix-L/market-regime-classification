@@ -3,7 +3,7 @@
 The smallest valid workflow for this repository is:
 
 1. Load canonical bars externally via `market-data-core`.
-2. Pass bars to a detector in this repository.
+2. Pass a single symbol / single timeframe ordered bar series to a detector in this repository.
 3. Receive `DetectionResult` with per-bar regime labels.
 
 ## Explicitly out of the minimum pipeline

@@ -52,6 +52,7 @@ def validate_detector_input_v1(data: Any) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     seen: set[tuple[str, datetime]] = set()
     prev_ts: datetime | None = None
+    series_symbol: str | None = None
 
     for i, row in enumerate(data):
         if not isinstance(row, Mapping):
@@ -63,13 +64,18 @@ def validate_detector_input_v1(data: Any) -> list[dict[str, Any]]:
             raise DetectorContractError(f"row {i} missing required columns: {missing}")
 
         ts = _coerce_timestamp(row_dict["timestamp"])
-        if prev_ts is not None and ts <= prev_ts:
-            raise DetectorContractError("timestamps must be strictly increasing")
 
         symbol = str(row_dict["symbol"])
+        if series_symbol is None:
+            series_symbol = symbol
+        elif symbol != series_symbol:
+            raise DetectorContractError("input must be a single symbol ordered series")
+
         key = (symbol, ts)
         if key in seen:
             raise DetectorContractError("(symbol, timestamp) must be unique")
+        if prev_ts is not None and ts <= prev_ts:
+            raise DetectorContractError("timestamps must be strictly increasing")
         seen.add(key)
 
         for col in _NUMERIC_COLUMNS:

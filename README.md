@@ -17,8 +17,6 @@ Current work in this cycle focuses on **Phase 0/1 retrofit alignment**:
 - minimal end-to-end detector pipeline definition,
 - internal contract consistency improvements.
 
-## Relationship to `market-data-core`
-
 `market-data-core` is the upstream data foundation and owns:
 
 - provider adapters and data ingestion,
@@ -53,3 +51,7 @@ print(result.detector_name, result.summary)
 ```
 
 `run(...)` returns `DetectionResult`, the standard artifact consumed by downstream modules.
+
+## Contributor boundary reminder
+
+Do not add local data-provider adapters, market-data fetching utilities, or upstream-style canonicalization/storage helpers in this repository; those belong in `market-data-core`.

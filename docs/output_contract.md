@@ -20,7 +20,9 @@ All detectors must return `core.result.DetectionResult` as the inter-module arti
 
 ## Notes
 
-- Detector-specific diagnostic fields are allowed (e.g., ADX/DI for Wilder-style) but are not part of the minimum cross-detector contract.
+- Required fields above are the minimum shared contract for cross-detector tooling.
+- Detector-specific diagnostic fields are allowed (e.g., ADX/DI for Wilder-style) but are not part of the shared minimum.
+- Cross-detector consumers should rely on the shared required fields unless they explicitly opt into detector-specific columns.
 - `DetectionResult.bars` remains the tabular per-bar payload (`list[dict]` in the current baseline).
 
 ## Runtime enforcement

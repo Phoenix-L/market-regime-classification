@@ -26,10 +26,11 @@ It does **not** perform upstream responsibilities such as provider access, canon
 
 1. Input must be non-empty `list[Mapping]`.
 2. `timestamp` must be timezone-aware (`datetime` with tzinfo or parseable ISO-8601 string with timezone offset).
-3. Rows must be strictly ordered by `timestamp` ascending.
-4. `(symbol, timestamp)` must be unique.
-5. Numeric detector inputs (`open`, `high`, `low`, `close`, `volume`) must be castable to numeric.
-6. Expected timezone convention must align with upstream `market-data-core` contract.
+3. Minimal detector pipeline input must be a single symbol / single timeframe ordered series.
+4. Rows must be strictly ordered by `timestamp` ascending.
+5. `(symbol, timestamp)` must be unique.
+6. Numeric detector inputs (`open`, `high`, `low`, `close`, `volume`) must be castable to numeric.
+7. Expected timezone convention must align with upstream `market-data-core` contract.
 
 ## Runtime enforcement
 

@@ -31,3 +31,23 @@ def test_validate_detector_input_v1_rejects_non_increasing_timestamp() -> None:
     rows = [_row("2026-01-02T00:00:00+00:00"), _row("2026-01-01T00:00:00+00:00")]
     with pytest.raises(DetectorContractError, match="strictly increasing"):
         validate_detector_input_v1(rows)
+
+
+def test_validate_detector_input_v1_rejects_missing_symbol() -> None:
+    row = _row("2026-01-01T00:00:00+00:00")
+    row.pop("symbol")
+    with pytest.raises(DetectorContractError, match="missing required columns"):
+        validate_detector_input_v1([row])
+
+
+def test_validate_detector_input_v1_rejects_missing_timestamp() -> None:
+    row = _row("2026-01-01T00:00:00+00:00")
+    row.pop("timestamp")
+    with pytest.raises(DetectorContractError, match="missing required columns"):
+        validate_detector_input_v1([row])
+
+
+def test_validate_detector_input_v1_rejects_duplicate_symbol_timestamp() -> None:
+    rows = [_row("2026-01-01T00:00:00+00:00"), _row("2026-01-01T00:00:00+00:00")]
+    with pytest.raises(DetectorContractError, match="unique"):
+        validate_detector_input_v1(rows)
