@@ -1,58 +1,59 @@
 # market-regime-classification
 
-`market-regime-classification` is a standalone, research-oriented repository for defining, testing, and comparing **market regime detectors**.
+`market-regime-classification` is a research-oriented Python package for defining, running, and comparing **market regime detectors**.
 
-## What this repository is
+## Current repository reality
 
-- A detector-focused research platform.
-- A home for regime state machine design and detector outputs.
-- A place to evaluate and compare multiple regime detection approaches.
-- A visualization and diagnostics layer for regime studies.
+This repository already includes:
 
-## What this repository is not
+- Phase 2 baseline: implemented Wilder-style detector.
+- Phase 3 baseline: visualization utilities for detector diagnostics.
+- Phase 4 baseline: evaluation/comparison utilities.
 
-- Not a market data ingestion/normalization foundation.
-- Not a broker/execution/trading strategy engine.
-- Not a duplicate of `market-data-core`.
+Current work in this cycle focuses on **Phase 0/1 retrofit alignment**:
+
+- explicit detector input/output contracts,
+- strict boundary with `market-data-core`,
+- minimal end-to-end detector pipeline definition,
+- internal contract consistency improvements.
 
 ## Relationship to `market-data-core`
 
-This repository assumes `market-data-core` is the trusted upstream source for canonical/curated OHLCV bars, session semantics, and data quality rules.
+`market-data-core` is the upstream data foundation and owns:
 
-This repository consumes that upstream data and focuses on:
+- provider adapters and data ingestion,
+- canonical OHLCV schema,
+- validation and normalization,
+- calendar/session semantics,
+- storage helpers and dataset access.
 
-- detector-specific signal derivation,
-- regime classification/state transitions,
-- detector output artifacts,
-- comparison/evaluation workflows,
-- regime diagnostics visualizations.
+This repository consumes upstream canonical bars and owns:
 
-See `docs/boundary_with_market_data_core.md` for explicit boundary definitions.
+- detector definitions and detector-specific calculations,
+- regime state labeling and detector outputs,
+- visualization and evaluation of detector outputs.
 
-## Current maturity
+See `docs/boundary_with_market_data_core.md` for ownership boundaries.
 
-This repo is currently in **Phase 4: evaluation baseline for the Wilder-style detector**.
+## Core contracts
 
-Included now:
-- repository/package skeleton and contracts,
-- implemented Wilder-style detector (signals + classifier + state machine),
-- detector output schema, baseline visualization artifacts (price/regime, ADX, DMI), and baseline evaluation toolkit,
-- architecture and planning documents,
-- focused unit tests for core and Wilder baseline behavior.
+- Input contract: `docs/input_contract.md`
+- Output contract: `docs/output_contract.md`
+- Minimal pipeline: `docs/pipeline.md`
+- State-machine policy: `docs/state_machine.md`
 
-Not included yet:
-- feature-based detector implementation,
-- advanced multi-detector comparison dashboards/workflows,
-- richer statistical ranking/significance layer for cross-detector studies.
+## Minimal detector usage
 
-## Planned detector families
+```python
+from market_regime_classification.detectors.wilder_style import WilderStyleDetector
 
-- Wilder-style detector (first implementation phase)
-- Feature-based detector (later implementation phase)
+bars = load_from_market_data_core(...)  # external upstream call
+result = WilderStyleDetector().run(bars)
+print(result.detector_name, result.summary)
+```
 
-## Next implementation steps
+`run(...)` returns `DetectionResult`, the standard artifact consumed by downstream modules.
 
-1. Implement Phase 5 feature-based detector with shared contracts.
-2. Expand visual/evaluation diagnostics for multi-detector parity.
-3. Build Phase 6 comparison workflows and standardized benchmark reports.
-4. Add richer statistical significance tooling for detector comparison.
+## Contributor boundary reminder
+
+Do not add local data-provider adapters, market-data fetching utilities, or upstream-style canonicalization/storage helpers in this repository; those belong in `market-data-core`.

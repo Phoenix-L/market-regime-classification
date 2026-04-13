@@ -1,8 +1,8 @@
 # Boundary with `market-data-core`
 
-## Ownership Matrix
+## Ownership matrix
 
-## `market-data-core` owns
+### `market-data-core` owns
 
 - Provider adapters / external data ingestion.
 - Canonical OHLCV schema and normalization.
@@ -10,36 +10,27 @@
 - Calendar/session handling.
 - Storage and dataset access APIs.
 
-## `market-regime-classification` owns
+### `market-regime-classification` owns
 
 - Detector interfaces and detector family implementations.
 - Detector-specific feature derivation and signal composition.
-- Regime state machine and label semantics.
-- Detector output contracts and metadata.
+- Regime state labels and detector output contracts.
 - Evaluation/comparison workflows for regimes.
 - Visualization for detector diagnostics.
 
-## Upstream Contract Assumptions (Current)
+## Contract handoff
 
-This repository currently assumes upstream-delivered bars include:
+This repository consumes upstream canonical bar payloads and enforces only detector-entry preconditions described in `docs/input_contract.md`.
 
-- Timestamp index or timestamp column.
-- Canonical OHLCV fields.
-- Instrument + timeframe metadata.
-- Session-aware semantics already resolved upstream.
+## Must not be implemented here
 
-## Must Not Be Duplicated Here
-
-- Re-normalization pipelines already owned by `market-data-core`.
+- Provider/data fetching adapters.
+- Canonicalization/re-cleaning pipelines owned upstream.
 - Alternate canonical schema definitions.
-- Dataset storage/provider orchestration.
+- Storage/provider orchestration abstractions.
 
-## Open Contract Sync Items (TODO)
+## Minimal integration expectation
 
-1. Confirm exact `market-data-core` Python API for bar retrieval.
-2. Confirm canonical column naming and timezone/session conventions.
-3. Confirm dataset metadata fields to preserve in detector outputs.
-4. Confirm expected null/missing-data policy before detector runs.
-5. Align result artifact serialization conventions for cross-repo workflows.
+`market-data-core` load (external) -> detector run in this repo -> `DetectionResult` output.
 
-Until these are confirmed, this repo uses interface placeholders and explicit TODO markers instead of speculative concrete adapters.
+No market-data fetching path is implemented inside this package.

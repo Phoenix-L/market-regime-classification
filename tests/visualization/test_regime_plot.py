@@ -18,7 +18,8 @@ def _sample_detector_output() -> list[dict[str, float | str]]:
     for i, c in enumerate(closes):
         bars.append(
             {
-                "ts": f"2026-02-{i+1:02d}",
+                "symbol": "SPY",
+                "timestamp": f"2026-02-{i+1:02d}T00:00:00+00:00",
                 "open": c - 0.1,
                 "high": c + 0.9,
                 "low": c - 0.9,
@@ -44,7 +45,8 @@ def test_plot_from_detection_result_smoke(tmp_path: Path) -> None:
     closes = [100 + i * 0.5 for i in range(40)]
     data = [
         {
-            "ts": f"2026-03-{i+1:02d}",
+            "symbol": "SPY",
+            "timestamp": f"2026-03-{i+1:02d}T00:00:00+00:00",
             "open": c - 0.2,
             "high": c + 0.8,
             "low": c - 0.8,

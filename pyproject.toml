@@ -15,6 +15,9 @@ dependencies = []
 dev = [
   "pytest>=8.0",
 ]
+upstream = [
+  "market-data-core",
+]
 
 [project.scripts]
 market-regime = "market_regime_classification.cli.main:main"
