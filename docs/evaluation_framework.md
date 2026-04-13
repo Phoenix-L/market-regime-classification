@@ -34,6 +34,11 @@ The baseline evaluation layer now provides:
 - consistent horizon handling across detectors
 - full ranking/comparison dashboards deferred to later phases
 
+Validation hardening (Phase 4):
+- row-level required-column checks across the full dataset (not first-row-only),
+- finite numeric price enforcement for forward/event calculations,
+- deterministic detector-key ordering in comparison summaries.
+
 ## Important Scope Boundary
 
 Evaluation is about **regime-label quality and behavioral separation**, not strategy backtesting.

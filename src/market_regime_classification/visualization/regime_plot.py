@@ -1,5 +1,6 @@
 """Single-detector regime plotting entry points."""
 
+from collections.abc import Mapping as MappingABC
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -14,20 +15,62 @@ _REQUIRED_COLUMNS = {
     "regime_final",
     "regime_direction",
 }
+_ALLOWED_REGIMES = {"oscillating", "transition", "trending"}
+_ALLOWED_DIRECTIONS = {"up", "down", "none"}
 
 
 def _coerce_rows(bars: Any) -> list[dict[str, Any]]:
     if not isinstance(bars, list):
         raise TypeError("Visualization baseline expects list[dict] detector bars")
-    return [dict(row) for row in bars]
+    rows: list[dict[str, Any]] = []
+    for i, row in enumerate(bars):
+        if not isinstance(row, MappingABC):
+            raise TypeError(f"Visualization row {i} must be mapping-like")
+        rows.append(dict(row))
+    return rows
 
 
 def _validate_columns(rows: list[dict[str, Any]]) -> None:
     if not rows:
         raise ValueError("Cannot plot empty detector output")
-    missing = sorted(col for col in _REQUIRED_COLUMNS if col not in rows[0])
-    if missing:
-        raise ValueError(f"Detector output missing required columns for plotting: {missing}")
+
+    for i, row in enumerate(rows):
+        missing = sorted(col for col in _REQUIRED_COLUMNS if col not in row)
+        if missing:
+            raise ValueError(f"Detector output missing required columns at row {i}: {missing}")
+
+
+def _coerce_numeric_series(rows: list[dict[str, Any]], column: str, *, allow_none: bool = True) -> list[float | None]:
+    out: list[float | None] = []
+    for i, row in enumerate(rows):
+        value = row.get(column)
+        if value is None:
+            if allow_none:
+                out.append(None)
+                continue
+            raise ValueError(f"Column '{column}' must be numeric; found None at row {i}")
+        try:
+            out.append(float(value))
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Column '{column}' must be numeric-or-None; invalid at row {i}") from exc
+    return out
+
+
+def _validate_regime_values(rows: list[dict[str, Any]]) -> tuple[list[str], list[str]]:
+    regime_final: list[str] = []
+    regime_direction: list[str] = []
+
+    for i, row in enumerate(rows):
+        final = str(row.get("regime_final", "transition"))
+        direction = str(row.get("regime_direction", "none"))
+        if final not in _ALLOWED_REGIMES:
+            raise ValueError(f"Invalid regime_final '{final}' at row {i}")
+        if direction not in _ALLOWED_DIRECTIONS:
+            raise ValueError(f"Invalid regime_direction '{direction}' at row {i}")
+        regime_final.append(final)
+        regime_direction.append(direction)
+
+    return regime_final, regime_direction
 
 
 def plot_wilder_regime(
@@ -48,12 +91,11 @@ def plot_wilder_regime(
     _validate_columns(rows)
 
     x = list(range(len(rows)))
-    close = [float(row["close"]) for row in rows]
-    adx = [row.get("adx") for row in rows]
-    di_plus = [row.get("di_plus") for row in rows]
-    di_minus = [row.get("di_minus") for row in rows]
-    regime_final = [str(row.get("regime_final", "transition")) for row in rows]
-    regime_direction = [str(row.get("regime_direction", "none")) for row in rows]
+    close = [float(v) for v in _coerce_numeric_series(rows, "close", allow_none=False)]
+    adx = _coerce_numeric_series(rows, "adx")
+    di_plus = _coerce_numeric_series(rows, "di_plus")
+    di_minus = _coerce_numeric_series(rows, "di_minus")
+    regime_final, regime_direction = _validate_regime_values(rows)
 
     fig, (ax_price, ax_adx, ax_dmi) = create_default_figure(len(rows))
 
@@ -85,6 +127,9 @@ def plot_from_detection_result(
     title: str | None = None,
 ) -> tuple[Any, tuple[Any, Any, Any]]:
     """Convenience entry point using DetectionResult-like object."""
+    if not hasattr(result, "bars"):
+        raise TypeError("DetectionResult-like object must provide .bars")
+
     detector_name = getattr(result, "detector_name", "unknown")
     detector_version = getattr(result, "detector_version", "unknown")
     cfg = getattr(result, "config_snapshot", {})

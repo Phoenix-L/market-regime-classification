@@ -55,7 +55,7 @@ It is intentionally data-consumer-side and does not own upstream raw data valida
 
 ## Upstream Dependency: `market-data-core`
 
-This repository assumes bars/session semantics are already curated upstream. Integration points are intentionally placeholders pending exact API contract sync.
+This repository assumes bars/session semantics are already curated upstream and uses explicit input/output contract docs for detector-entry and detector-output enforcement.
 
 ## Must Remain Outside This Repo
 

@@ -1,3 +1,5 @@
+import pytest
+
 from market_regime_classification.evaluation.event_study import (
     extract_regime_transition_events,
     run_regime_event_study,
@@ -50,3 +52,24 @@ def test_event_extraction_and_event_study_alignment() -> None:
     assert study["num_events"] >= 1
     assert 0 in study["aligned_return_summary"]
     assert "continuation_probability_trending" in study
+
+
+def test_forward_behavior_rejects_missing_price_on_later_row() -> None:
+    rows = _synthetic_rows()
+    rows[3].pop("close")
+    with pytest.raises(ValueError, match="row 3"):
+        summarize_forward_behavior(rows)
+
+
+def test_forward_behavior_rejects_non_finite_price() -> None:
+    rows = _synthetic_rows()
+    rows[5]["close"] = float("nan")
+    with pytest.raises(ValueError, match="finite"):
+        summarize_forward_behavior(rows)
+
+
+def test_forward_behavior_is_deterministic_for_identical_input() -> None:
+    rows = _synthetic_rows()
+    a = summarize_forward_behavior(rows, horizons=(1, 3, 5))
+    b = summarize_forward_behavior(rows, horizons=(1, 3, 5))
+    assert a == b
