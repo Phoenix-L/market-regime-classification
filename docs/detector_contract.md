@@ -1,58 +1,26 @@
 # Detector Contract
 
-## Base Detector Interface
+This document summarizes detector behavior and points to the contract source-of-truth docs.
 
-All detectors should implement the base interface exposed by `core.detector_base.BaseRegimeDetector`.
+## Source-of-truth contracts
 
-Required:
+- Input contract: `docs/input_contract.md`
+- Output contract: `docs/output_contract.md`
+- State-machine policy: `docs/state_machine.md`
+- Minimal pipeline: `docs/pipeline.md`
+
+## Base detector interface
+
+All detectors implement `core.detector_base.BaseRegimeDetector`:
+
 - `name: str`
 - `version: str`
 - `run(data, config=None) -> DetectionResult`
 
-## Expected Inputs
+## Standard artifact
 
-- Tabular bar data supplied by upstream `market-data-core` workflows.
-- Detector configuration object/dict (family-specific).
-- Optional run context (symbol/timeframe window metadata).
+Detectors must return `DetectionResult` and include contract-required per-bar output fields.
 
-## Expected Outputs
+## Boundary reminder
 
-Return `DetectionResult` with:
-- detector identity (`detector_name`, `detector_version`)
-- `config_snapshot` for reproducibility
-- `bars` table-like structure containing regime outputs
-- `summary` dictionary for aggregate run diagnostics
-- `artifacts` metadata for generated outputs
-
-## Required Output Fields (Per Bar)
-
-At minimum, detector output table should include:
-- `regime_raw` (proposal before anti-flip confirmation)
-- `regime_final` (post state-machine gate)
-- `regime_direction` (Up/Down/None)
-- `state_age` (bars since confirmed state start)
-- `transition_reason` (optional textual marker)
-- `confidence` (placeholder optional)
-
-## Metadata and Config Capture
-
-Every run should capture immutable detector metadata and resolved config snapshot to support exact reruns and comparisons.
-
-## Raw State vs Final State
-
-- Raw state represents immediate detector evidence.
-- Confirmed state applies anti-flip/hysteresis logic for stability.
-
-## Regime Structure vs Regime Direction
-
-State structure and direction are modeled separately:
-- Structure: Oscillating / Transition / Trending
-- Direction: Up / Down / None
-
-This improves comparability across detector families.
-
-## Comparison-Friendly Schema Principles
-
-- Stable common columns across detectors.
-- Detector-specific extra columns allowed under namespaced prefixes.
-- Preserve upstream bar key columns to allow joins and aligned studies.
+Detector entry expects upstream canonical data from `market-data-core`; this repository does not own data fetching/canonicalization/storage concerns.

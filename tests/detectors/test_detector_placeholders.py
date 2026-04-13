@@ -8,7 +8,8 @@ def _sample_bars() -> list[dict[str, float | str]]:
     for i, c in enumerate(closes):
         bars.append(
             {
-                "ts": f"2026-01-{i+1:02d}",
+                "symbol": "SPY",
+                "timestamp": f"2026-01-{i+1:02d}T00:00:00+00:00",
                 "open": c - 0.2,
                 "high": c + 0.8,
                 "low": c - 0.8,
@@ -54,8 +55,11 @@ def test_wilder_detector_result_structure_and_columns() -> None:
 
 
 def test_feature_based_placeholder_result() -> None:
-    data = [{"ts": "2026-01-01", "open": 1, "high": 1, "low": 1, "close": 1, "volume": 1}]
+    data = [{"symbol": "SPY", "timestamp": "2026-01-01T00:00:00+00:00", "open": 1, "high": 1, "low": 1, "close": 1, "volume": 1}]
     result = FeatureBasedDetector().run(data=data)
     assert result.detector_name == "feature_based"
-    assert result.bars == data
+    assert result.bars[0]["regime_final"] == "transition"
+    assert result.bars[0]["regime_raw"] == "transition"
+    for col in ("regime_raw", "regime_final", "regime_direction", "state_age"):
+        assert col in result.bars[0]
     assert result.summary["status"] == "placeholder"
