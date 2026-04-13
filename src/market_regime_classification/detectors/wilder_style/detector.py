@@ -4,6 +4,8 @@ from dataclasses import asdict
 from typing import Any, Mapping
 
 from ...core.detector_base import BaseRegimeDetector
+from ...core.input_contract import validate_detector_input_v1
+from ...core.output_contract import validate_detector_output_v1
 from ...core.result import DetectionResult
 from .classifier import classify_wilder_states
 from .config import WilderStyleConfig
@@ -17,21 +19,18 @@ class WilderStyleDetector(BaseRegimeDetector):
     version = "0.1.0"
 
     def run(self, data: Any, config: Mapping[str, Any] | None = None) -> DetectionResult:
-        if not isinstance(data, list):
-            raise TypeError("WilderStyleDetector expects list[Mapping] bar data in this baseline")
-        for col in ("open", "high", "low", "close", "volume"):
-            if data and col not in data[0]:
-                raise ValueError(f"Missing required OHLCV column: {col}")
+        rows_in = validate_detector_input_v1(data)
 
         cfg = WilderStyleConfig(**(config or {}))
         cfg.validate()
 
         rows = compute_wilder_signals(
-            data,
+            rows_in,
             wilder_length=cfg.wilder_length,
             recent_cross_window=cfg.recent_cross_window,
         )
         rows = classify_wilder_states(rows, cfg)
+        validate_detector_output_v1(rows)
 
         final_counts: dict[str, int] = {"oscillating": 0, "transition": 0, "trending": 0}
         for row in rows:
