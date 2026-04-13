@@ -1,3 +1,5 @@
+import pytest
+
 from market_regime_classification.evaluation.comparison import compare_detector_outputs
 
 
@@ -14,3 +16,13 @@ def test_compare_detector_outputs_scaffold() -> None:
     assert "det_a" in report["detectors"]
     assert "regime_stats" in report["detectors"]["det_a"]
     assert "forward_behavior" in report["detectors"]["det_a"]
+
+
+def test_compare_detector_outputs_rejects_empty_detector_rows() -> None:
+    with pytest.raises(ValueError, match="non-empty"):
+        compare_detector_outputs({"det_a": []})
+
+
+def test_compare_detector_outputs_is_deterministic_and_sorted_by_name() -> None:
+    report = compare_detector_outputs({"z_det": _rows(2.0), "a_det": _rows(0.0)}, horizons=(1, 3))
+    assert list(report["detectors"].keys()) == ["a_det", "z_det"]

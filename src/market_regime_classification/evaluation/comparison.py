@@ -17,7 +17,10 @@ def compare_detector_outputs(
         raise ValueError("detector_bars cannot be empty")
 
     per_detector: dict[str, Any] = {}
-    for name, bars in detector_bars.items():
+    for name in sorted(detector_bars):
+        bars = detector_bars[name]
+        if not isinstance(bars, list) or not bars:
+            raise ValueError(f"detector '{name}' must provide non-empty list[dict] bars")
         per_detector[name] = {
             "regime_stats": summarize_regime_durations(bars),
             "forward_behavior": summarize_forward_behavior(bars, horizons=horizons),

@@ -1,3 +1,5 @@
+import pytest
+
 from market_regime_classification.evaluation.regime_stats import (
     segment_state_runs,
     summarize_regime_durations,
@@ -31,3 +33,10 @@ def test_regime_duration_summary_and_transition_matrix() -> None:
     assert summary["transition_counts"]["oscillating->transition"] == 1
     assert summary["transition_matrix"]["transition"]["trending"] == 1
     assert summary["short_lived_run_count"] == 2
+
+
+def test_regime_stats_rejects_missing_state_column_on_later_row() -> None:
+    rows = _rows(["oscillating", "transition", "trending"])
+    rows[2].pop("regime_final")
+    with pytest.raises(ValueError, match="row 2"):
+        summarize_regime_durations(rows)

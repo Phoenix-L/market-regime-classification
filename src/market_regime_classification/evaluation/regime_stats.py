@@ -10,8 +10,12 @@ def _validate_rows(rows: list[dict[str, Any]], *, state_col: str = "regime_final
         raise TypeError("evaluation expects list[dict] rows")
     if not rows:
         raise ValueError("rows cannot be empty")
-    if state_col not in rows[0]:
-        raise ValueError(f"missing state column: {state_col}")
+
+    for i, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise TypeError(f"row {i} must be dict")
+        if state_col not in row:
+            raise ValueError(f"missing state column '{state_col}' at row {i}")
 
 
 def segment_state_runs(rows: list[dict[str, Any]], *, state_col: str = "regime_final") -> list[dict[str, Any]]:

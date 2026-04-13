@@ -1,8 +1,12 @@
 """Forward behavior and event-study utilities for regime analysis."""
 
 from collections import defaultdict
+import math
 from statistics import mean, median
 from typing import Any, Iterable
+
+
+_ALLOWED_DIRECTIONS = {"up", "down", "none"}
 
 
 def _require_rows(rows: list[dict[str, Any]]) -> None:
@@ -10,6 +14,29 @@ def _require_rows(rows: list[dict[str, Any]]) -> None:
         raise TypeError("evaluation expects list[dict] rows")
     if not rows:
         raise ValueError("rows cannot be empty")
+    for i, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise TypeError(f"row {i} must be dict")
+
+
+def _require_columns(rows: list[dict[str, Any]], *columns: str) -> None:
+    for i, row in enumerate(rows):
+        missing = [col for col in columns if col not in row]
+        if missing:
+            raise ValueError(f"rows missing columns at row {i}: {missing}")
+
+
+def _coerce_price_series(rows: list[dict[str, Any]], price_col: str) -> list[float]:
+    closes: list[float] = []
+    for i, row in enumerate(rows):
+        try:
+            value = float(row[price_col])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"price column '{price_col}' must be numeric at row {i}") from exc
+        if not math.isfinite(value):
+            raise ValueError(f"price column '{price_col}' must be finite at row {i}")
+        closes.append(value)
+    return closes
 
 
 def _forward_return(closes: list[float], idx: int, horizon: int) -> float | None:
@@ -42,13 +69,13 @@ def summarize_forward_behavior(
 ) -> dict[str, Any]:
     """Group forward return/move/efficiency summaries by regime label."""
     _require_rows(rows)
-    if group_col not in rows[0] or price_col not in rows[0]:
-        raise ValueError(f"rows must contain columns: {group_col}, {price_col}")
+    _require_columns(rows, group_col, price_col)
 
-    closes = [float(row[price_col]) for row in rows]
-    out: dict[str, Any] = {"horizons": list(horizons), "by_horizon": {}}
+    closes = _coerce_price_series(rows, price_col)
+    horizon_list = list(horizons)
+    out: dict[str, Any] = {"horizons": horizon_list, "by_horizon": {}}
 
-    for horizon in horizons:
+    for horizon in horizon_list:
         grouped: dict[str, list[dict[str, float]]] = defaultdict(list)
         for i, row in enumerate(rows):
             ret = _forward_return(closes, i, horizon)
@@ -89,8 +116,7 @@ def extract_regime_transition_events(
 ) -> list[dict[str, Any]]:
     """Extract confirmed state-change events."""
     _require_rows(rows)
-    if state_col not in rows[0]:
-        raise ValueError(f"missing state column: {state_col}")
+    _require_columns(rows, state_col)
 
     events: list[dict[str, Any]] = []
     for i in range(1, len(rows)):
@@ -116,10 +142,9 @@ def run_regime_event_study(
 ) -> dict[str, Any]:
     """Event-aligned returns around confirmed regime changes."""
     _require_rows(rows)
-    if price_col not in rows[0]:
-        raise ValueError(f"missing price column: {price_col}")
+    _require_columns(rows, price_col)
 
-    closes = [float(row[price_col]) for row in rows]
+    closes = _coerce_price_series(rows, price_col)
     events = extract_regime_transition_events(rows, to_state=focus_to_state)
 
     aligned: dict[int, list[float]] = defaultdict(list)
@@ -163,14 +188,16 @@ def run_regime_event_study(
 def _continuation_probability(
     rows: list[dict[str, Any]], *, state: str, horizon: int, price_col: str
 ) -> float | None:
-    closes = [float(row[price_col]) for row in rows]
+    closes = _coerce_price_series(rows, price_col)
     hits = 0
     total = 0
     for i, row in enumerate(rows):
         if str(row.get("regime_final")) != state:
             continue
         direction = str(row.get("regime_direction", "none"))
-        if direction not in {"up", "down"}:
+        if direction not in _ALLOWED_DIRECTIONS:
+            continue
+        if direction == "none":
             continue
         ret = _forward_return(closes, i, horizon)
         if ret is None:
@@ -184,7 +211,7 @@ def _continuation_probability(
 
 
 def _snapback_probability(rows: list[dict[str, Any]], *, horizon: int, price_col: str) -> float | None:
-    closes = [float(row[price_col]) for row in rows]
+    closes = _coerce_price_series(rows, price_col)
     reversals = 0
     total = 0
     for i in range(len(rows) - 2 * horizon):

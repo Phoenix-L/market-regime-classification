@@ -17,11 +17,6 @@ Current work in this cycle focuses on **Phase 0/1 retrofit alignment**:
 - minimal end-to-end detector pipeline definition,
 - internal contract consistency improvements.
 
-- explicit detector input/output contracts,
-- strict boundary with `market-data-core`,
-- minimal end-to-end detector pipeline definition,
-- internal contract consistency improvements.
-
 `market-data-core` is the upstream data foundation and owns:
 
 - provider adapters and data ingestion,
