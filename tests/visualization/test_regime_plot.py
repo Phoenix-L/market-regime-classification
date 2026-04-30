@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -43,10 +44,11 @@ def test_plot_wilder_regime_returns_three_axes_and_saves(tmp_path: Path) -> None
 
 def test_plot_from_detection_result_smoke(tmp_path: Path) -> None:
     closes = [100 + i * 0.5 for i in range(40)]
+    start = datetime(2026, 3, 1, tzinfo=timezone.utc)
     data = [
         {
             "symbol": "SPY",
-            "timestamp": f"2026-03-{i+1:02d}T00:00:00+00:00",
+            "timestamp": (start + timedelta(days=i)).isoformat(),
             "open": c - 0.2,
             "high": c + 0.8,
             "low": c - 0.8,
